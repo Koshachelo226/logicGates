@@ -20,8 +20,8 @@ void draw() {
   }
   
   if (grid.gates.size() > 0) {
-    //println(grid.gates.get(0).moving);
-    //grid.gates.get(0).posX = mouseX;
-    //grid.gates.get(0).posY = mouseY;
+    println("Selected: " + selectedID);
+    println("Existing: " + grid.gates.size());
+    println(selectedID.size());
   }
 }
