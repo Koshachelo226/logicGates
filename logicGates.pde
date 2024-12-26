@@ -20,8 +20,10 @@ void draw() {
   }
   
   if (grid.gates.size() > 0) {
-    println("Selected: " + selectedID);
-    println("Existing: " + grid.gates.size());
+    print("Selected: " + selectedID + " ");
     println(selectedID.size());
+    println("Existing: " + grid.gates.size());
+    println("Next ID: " + grid.lastID);
+    //println(grid.tempGates.size());  
   }
 }

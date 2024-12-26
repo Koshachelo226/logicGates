@@ -42,8 +42,8 @@ void keyPressed() {
     }
   }
   
-  if (key == 'd' && selectedID.size() > 0 || key == 'D' && selectedID.size() > 0) {
-    for (int id = 0; id < selectedID.size(); id++) {
+  if (key == 'd' && selectedID.size() > 0) {
+    for (int id = selectedID.size()-1; id >= 0; id--) {
       grid.gates.get(selectedID.get(id)).selected = false;
       selectedID.remove(id);
     }
@@ -62,27 +62,29 @@ void keyPressed() {
   }
   
   if (key == DELETE && selectedID.size() > 0) {
-    int numberOfDeleted = 0;
+    ArrayList<circuitGrid.gate> tempGates = new ArrayList<circuitGrid.gate>();
+    //int numberOfDeleted = 0;
     
-    /*for (int id = 0; id < selectedID.size(); id++) {
-      if (id < selectedID.size()-1 && grid.gates.get(id).selected) {
-        int nextID = selectedID.get(id);
-        grid.gates.remove(selectedID.get(id));
-        numberOfDeleted++;
+    for (int nextGate = 0; nextGate < grid.gates.size(); nextGate++) {
+      if (!grid.gates.get(nextGate).selected) {
+        tempGates.add(grid.gates.get(nextGate));
+      }  else {
+        continue;
       }
-    }*/
-    
-    for (int idToDel = 0; idToDel < selectedID.size(); idToDel++) {
-      println("del2");
-      grid.gates.remove(int(selectedID.get(idToDel)));
-      numberOfDeleted++;
     }
+
+    grid.gates.clear();
     
-    while (selectedID.size() > 0) {
-      selectedID.remove(0);
+    for (int gateAdd = 0; gateAdd < tempGates.size(); gateAdd++) {
+      grid.gates.add(tempGates.get(gateAdd));
     }
-    
-    grid.lastID -= numberOfDeleted;
+
+    for (int id = grid.gates.size()-1; id >= 0; id--) {
+      grid.gates.get(id).ID = id;
+    }
+
+    grid.lastID = grid.gates.size();
+    selectedID.clear();
   }
   
   if (key == '-' && Scale > 1) {
