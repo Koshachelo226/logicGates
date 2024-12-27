@@ -1,8 +1,10 @@
 boolean CtrlPressed = false;
+boolean ShiftPressed = false;
 
 void keyPressed() {  
   
-  if (key == CODED && keyCode == CONTROL) {CtrlPressed = true; println("ctrl");}
+  if (key == CODED && keyCode == CONTROL) {CtrlPressed = true;}
+  if (key == CODED && keyCode == SHIFT) {ShiftPressed = true;}
   
   if (key == '0') {
     currentTool = 0; //Selection tool (click)
@@ -20,6 +22,10 @@ void keyPressed() {
     currentTool = 3;
   }
   
+  if (key == '4' && !CtrlPressed) {
+    currentTool = 4;
+  }
+  
   if (key == 'i') {
     if (selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "and" || selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "or") {
       grid.gates.get(selectedID.get(2)).Inputs.add(selectedID.get(0));
@@ -27,7 +33,7 @@ void keyPressed() {
       println("CONNECTED");
     }
     
-    else if (selectedID.size() > 1 && grid.gates.get(selectedID.get(1)).Type == "not") {
+    else if (selectedID.size() > 1 && grid.gates.get(selectedID.get(1)).Type == "not" || selectedID.size() > 1 && grid.gates.get(selectedID.get(1)).Type == "out") {
       grid.gates.get(selectedID.get(1)).Inputs.add(selectedID.get(0));
       println("CONNECTED");
     }
@@ -63,7 +69,16 @@ void keyPressed() {
   
   if (key == DELETE && selectedID.size() > 0) {
     ArrayList<circuitGrid.gate> tempGates = new ArrayList<circuitGrid.gate>();
-    //int numberOfDeleted = 0;
+    
+    for (int gate = 0; gate < grid.gates.size(); gate++) {
+      if (grid.gates.get(gate).Inputs.size() > 0) {
+        for (int input = grid.gates.get(gate).Inputs.size()-1; input >= 0; input--) {
+          if (grid.gates.get(grid.gates.get(gate).Inputs.get(input)).selected) {
+            grid.gates.get(gate).Inputs.remove(input);
+          }
+        }
+      }
+    }
     
     for (int nextGate = 0; nextGate < grid.gates.size(); nextGate++) {
       if (!grid.gates.get(nextGate).selected) {
@@ -96,20 +111,30 @@ void keyPressed() {
   }
   
   
-  if (key == '1' && CtrlPressed == true) {
+  if (key == '1' && CtrlPressed == true) { //Create AND gate
     grid.createGate(0);
   }
-  if (key == '2' && CtrlPressed == true) {
+  if (key == '2' && CtrlPressed == true) { //Create OR gate
     grid.createGate(1);
   }
-  if (key == '3' && CtrlPressed == true) {
+  if (key == '3' && CtrlPressed == true) { //Create NOT gate
     grid.createGate(2);
+  }
+  if (key == '4' && CtrlPressed == true) { //Create OUT gate
+    grid.createGate(3);
   }
 }
 
 
 void mouseClicked() {
   if (grid.gates.size() > 0 && currentTool == 0) {  //Select gate
+    if (!CtrlPressed) {
+      for (int gate = 0; gate < grid.gates.size(); gate++) {
+        if (grid.gates.get(gate).selected) {grid.gates.get(gate).selected = false;}
+      }
+      
+      selectedID.clear();
+    }
     for (int Gate = 0; Gate <= grid.gates.size() - 1; Gate++) {
       grid.gates.get(Gate).checkClick();
     }
@@ -126,8 +151,13 @@ void mouseClicked() {
   if (currentTool == 3) {  //Create NOT gate
     grid.createGate(2);
   }
+  
+  if (currentTool == 4) {  //Create OUT gate
+    grid.createGate(3);
+  }
 }
 
 void keyReleased() {
   if (key == CODED && keyCode == CONTROL) {CtrlPressed = false;}
+  if (key == CODED && keyCode == SHIFT) {ShiftPressed = false;}
 }
