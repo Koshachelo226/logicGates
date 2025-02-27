@@ -1,32 +1,41 @@
 boolean CtrlPressed = false;
 boolean ShiftPressed = false;
 
+char[] lettersListRU = {'й','ц','у','к','е','н','г','ш','щ','з','х','ъ','ф','ы','в','а','п','р','о','л','д','ж','э','я','ч','с','м','и','т','ь','б','ю'};
+char[] lettersListEN = {'q','w','e','r','t','y','u','i','o','p','[',']','a','s','d','f','g','h','j','k','l',';','\'','z','x','c','v','b','n','m',',','.'};
+
 void keyPressed() {  
+  
+  char pressedKey = Character.toLowerCase(key);
   
   if (key == CODED && keyCode == CONTROL) {CtrlPressed = true;}
   if (key == CODED && keyCode == SHIFT) {ShiftPressed = true;}
   
-  if (key == '0') {
+  if (pressedKey == '0') {
     currentTool = 0; //Selection tool (click)
   }
   
-  if (key == '1' && !CtrlPressed) {
+  if (pressedKey == '1' && !CtrlPressed) {
     currentTool = 1;
   }
   
-  if (key == '2' && !CtrlPressed) {
+  if (pressedKey == '2' && !CtrlPressed) {
     currentTool = 2;
   }
   
-  if (key == '3' && !CtrlPressed) {
+  if (pressedKey == '3' && !CtrlPressed) {
     currentTool = 3;
   }
   
-  if (key == '4' && !CtrlPressed) {
+  if (pressedKey == '4' && !CtrlPressed) {
     currentTool = 4;
   }
   
-  if (key == 'i') {
+  if (pressedKey(key) == 'i' && !CtrlPressed) {
+    if (selectedID.size() == 2 && grid.gates.get(selectedID.get(1)).Inputs.size() < 2 && grid.gates.get(selectedID.get(1)).Type == "and") {
+      grid.gates.get(selectedID.get(1)).Inputs.add(selectedID.get(0));
+    }
+    
     if (selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "and" || selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "or") {
       grid.gates.get(selectedID.get(2)).Inputs.add(selectedID.get(0));
       grid.gates.get(selectedID.get(2)).Inputs.add(selectedID.get(1));
@@ -39,7 +48,14 @@ void keyPressed() {
     }
   }
   
-  if (key == 't' && grid.gates.size() > 0) {
+  if (key == 9 && selectedID.size() > 0) {  //Ctrl+I = 9... Stupid Ctrl keys and ASCII...
+    println("Cleared");
+    for (int gate = 0; gate < selectedID.size(); gate++) {
+      grid.gates.get(selectedID.get(gate)).Inputs.clear();
+    }
+  }
+  
+  if (pressedKey(key) == 't' && grid.gates.size() > 0) {
     for (int Gate = 0; Gate < grid.gates.size(); Gate++) {
       if (grid.gates.get(Gate).selected == false) {continue;}
       
@@ -48,14 +64,14 @@ void keyPressed() {
     }
   }
   
-  if (key == 'd' && selectedID.size() > 0) {
+  if (pressedKey(key) == 'd' && selectedID.size() > 0) {
     for (int id = selectedID.size()-1; id >= 0; id--) {
       grid.gates.get(selectedID.get(id)).selected = false;
       selectedID.remove(id);
     }
   }
   
-  if (key == 'm' && selectedID.size() > 0) {
+  if (pressedKey(key) == 'm' && selectedID.size() > 0) {
     prevMouseX = mouseX;
     prevMouseY = mouseY;
     
@@ -110,6 +126,16 @@ void keyPressed() {
     Scale++;
   }
   
+  if (pressedKey(key) == 's' && grid.gates.size() > 0) {
+    saveGrid("save/grid.csv");
+  }
+  
+  if (pressedKey(key) == 'l') {
+    grid.gates.clear();
+    selectedID.clear();
+    loadGrid("save/grid.csv");
+  }
+  
   
   if (key == '1' && CtrlPressed == true) { //Create AND gate
     grid.createGate(0);
@@ -160,4 +186,22 @@ void mouseClicked() {
 void keyReleased() {
   if (key == CODED && keyCode == CONTROL) {CtrlPressed = false;}
   if (key == CODED && keyCode == SHIFT) {ShiftPressed = false;}
+}
+
+char pressedKey(char keey) {
+  char out = 'q';
+  
+  for (int i = 0; i < lettersListRU.length; i++) {
+    if (Character.toLowerCase(keey) == lettersListRU[i]) {
+      out = lettersListEN[i];
+      break;
+    }
+    
+    if (Character.toLowerCase(keey) == lettersListEN[i]) {
+      out = lettersListEN[i];
+      break;
+    }
+  }
+  
+  return out;
 }

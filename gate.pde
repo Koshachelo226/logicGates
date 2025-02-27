@@ -31,6 +31,35 @@ class circuitGrid {
     gates.add(newGate);
   }
   
+  void createNewGate(int id, String type, ArrayList inputs, String output, float posX, float posY, String toggled) {
+    gate newGate = new gate();
+    lastID = gates.size() + 1;
+    newGate.ID = id;
+    
+    switch(type) {
+      case "and" :
+        newGate.Type = "and";
+        break;
+      case "or" :
+        newGate.Type = "or";
+        break;
+      case "not" :
+        newGate.Type = "not";
+        break;
+      case "out" :
+        newGate.Type = "out";
+      default :
+        println("Incorrect Type in: " + id);
+    }
+    
+    newGate.Inputs = inputs;
+    newGate.Output = boolean(output);
+    newGate.posX = posX;
+    newGate.posY = posY;
+    newGate.toggled = boolean(toggled);
+    gates.add(newGate);
+  }
+  
   class gate {
     String Type = "";
     int ID;
@@ -257,8 +286,12 @@ class circuitGrid {
       }
       
       if (moving == true) {
-        posX = mouseX-prevMouseX+prevPosX;
-        posY = mouseY-prevMouseY+prevPosX;
+        posX += mouseX - pmouseX;
+        posY += mouseY - pmouseY;
+        
+        if (mousePressed) {
+          moving = false;
+        }
       }
     }
     
