@@ -1,5 +1,9 @@
+import controlP5.*;
+ControlP5 cp5;
+
 circuitGrid grid = new circuitGrid();
 PFont mainFont;
+PImage background;
 
 int currentTool = 0;
 float Scale = 5;
@@ -9,19 +13,83 @@ float prevMouseY;
 int prevXmouse;
 int prevYmouse;
 
-String[] toolsEN = {"Selection", "AND", "OR", "NOT", "OUT"};
+String[] toolsEN = {"Selection", "AND", "OR", "NOT", "OUT", "XOR"};
+
+boolean drawGrid = true;
 
 void setup() {
-  mainFont = loadFont("Arial-Black-36.vlw");
+  background = loadImage("background.png");
+  cp5 = new ControlP5(this);
+  
   size(700, 700);
+  surface.setResizable(true);
+  //fullScreen();
+  mainFont = loadFont("Arial-Black-36.vlw");
+  frameRate(3000);
+  
+  cp5.addButton("AND")
+     .setValue(0)
+     .setPosition(65, 5)
+     .setSize(50,50)
+     ;
+  cp5.addButton("OR")
+     .setValue(0)
+     .setPosition(120, 5)
+     .setSize(50,50)
+     ;
+  cp5.addButton("NOT")
+     .setValue(0)
+     .setPosition(175, 5)
+     .setSize(50,50)
+     ;
+  cp5.addButton("XOR")
+     .setValue(0)
+     .setPosition(230, 5)
+     .setSize(50,50)
+     ;
+  cp5.addButton("OUT")
+     .setValue(0)
+     .setPosition(285, 5)
+     .setSize(50,50)
+     ;
+  cp5.addButton("Select")
+     .setValue(0)
+     .setPosition(10, 5)
+     .setSize(50,50)
+     ;
 }
 
 void draw() {
-  background(50);
+  if (!drawGrid) {
+    background(50);
+  }
+  
+  else {
+    for (int imgX = 0; imgX <= width; imgX+= 100) {
+      for (int imgY = 0; imgY <= height; imgY += 99) {
+        image(background, imgX, imgY);
+      }
+    }
+  }
+  
+  /*for (int lineX = width; lineX >= 0; lineX -= 30) {
+    line (lineX, 0, lineX, height);
+  }*/
+  
+  /*for (int lineY = 30; lineY <= height; lineY += 30) {
+    line (0, lineY, width, lineY);
+  }*/
   
   for (int gate = 0; gate < grid.gates.size(); gate++) {
+    
+    if (middleMousePressed) {
+      grid.gates.get(gate).posX += mouseX - pmouseX;
+      grid.gates.get(gate).posY += mouseY - pmouseY;
+    }
+    
     grid.gates.get(gate).drawGate(Scale);
     grid.gates.get(gate).drawConnections();
+    
     grid.gates.get(gate).calcGate();
   }
   
@@ -39,8 +107,8 @@ void draw() {
   if (!mousePressed) {
     prevXmouse = mouseX;
     prevYmouse = mouseY;
-  }  
-  else if (mousePressed && currentTool == 0) {
+  } 
+  else if (mousePressed && currentTool == 0  && mouseButton == LEFT) {
     float x;
     float y;
     stroke(0, 100, 0, 200);
@@ -71,8 +139,25 @@ void draw() {
   
   fill(255);
   textFont(mainFont, 24);
-  text(toolsEN[currentTool], 5, 20);
+  text(toolsEN[currentTool], (width/2)-30, height - 20);
+  textFont(mainFont, 12);
+  text("5 - XOR gate", width - 120, height - 5);
+  text("4 - OUT gate", width - 120, height - 15);
+  text("3 - NOT gate", width - 120, height - 25);
+  text("2 - OR gate", width - 120, height - 35);
+  text("1 - AND gate", width - 120, height - 45);
+  text("0 - Selection tool", width - 120, height - 55);
+  
+  text("MMB - Move grid", 5, height - 5);
+  text("S/L - Save/load grid", 5, height - 15);
+  text("+/- - Change scale", 5, height - 25);
+  text("Delete - Remove gates", 5, height - 35);
+  text("M - Move gates", 5, height - 45);
+  text("D - Deselect gates", 5, height - 55);
+  text("T - Toggle gate", 5, height - 65);
+  text("I - Connect gates", 5, height - 75);
 
+  //println(frameRate);
 }
 
 void box(float x1, float y1, float x2, float y2) {

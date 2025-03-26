@@ -25,6 +25,10 @@ class circuitGrid {
       newGate.Type = "out";
     }
     
+    if (type == 4) {
+      newGate.Type = "xor";
+    }
+    
     newGate.posX = mouseX;
     newGate.posY = mouseY;
     
@@ -35,6 +39,7 @@ class circuitGrid {
     gate newGate = new gate();
     lastID = gates.size() + 1;
     newGate.ID = id;
+    //newGate.Type = type;
     
     switch(type) {
       case "and" :
@@ -48,6 +53,10 @@ class circuitGrid {
         break;
       case "out" :
         newGate.Type = "out";
+        break;
+      case "xor" :
+        newGate.Type = "xor";
+        break;
       default :
         println("Incorrect Type in: " + id);
     }
@@ -156,6 +165,50 @@ class circuitGrid {
           line(scale, -5 * scale, -10 * scale, -5 * scale);
           popMatrix();
           break;
+          
+        case "xor" :   
+          if (selected) {
+            strokeWeight(5);
+            stroke(0, 255, 0);
+            
+            pushMatrix();
+            translate(posX, posY);
+            fill(255);
+            text(str(ID), 10, 10);
+            line(-10 * scale, -5 * scale, -5 * scale, 0.75 * scale);
+            line(-5 * scale, 0.75 * scale, -10 * scale, 5 * scale);
+            line(-10 * scale, 5 * scale, scale, 5 * scale);
+            line(scale, 5 * scale, 5 * scale, scale);
+            line(5 * scale, scale, scale, -5 * scale);
+            line(scale, -5 * scale, -10 * scale, -5 * scale);
+            line(-12 * scale, -5 * scale, -7 * scale, 0.75 * scale);
+            line(-7 * scale, 0.75 * scale, -12 * scale, 5 * scale);
+            popMatrix();
+          }
+          
+          strokeWeight(3);
+          if (Output) {
+            stroke(255, 0 , 0);
+          }
+          
+          else if (!Output) {
+            stroke(255);
+          }
+          
+          pushMatrix();
+          translate(posX, posY);
+          fill(255);
+          text(str(ID), 10, 10);
+          line(-10 * scale, -5 * scale, -5 * scale, 0.75 * scale);
+          line(-5 * scale, 0.75 * scale, -10 * scale, 5 * scale);
+          line(-10 * scale, 5 * scale, scale, 5 * scale);
+          line(scale, 5 * scale, 5 * scale, scale);
+          line(5 * scale, scale, scale, -5 * scale);
+          line(scale, -5 * scale, -10 * scale, -5 * scale);
+          line(-12 * scale, -5 * scale, -7 * scale, 0.75 * scale);
+          line(-7 * scale, 0.75 * scale, -12 * scale, 5 * scale);
+          popMatrix();
+          break;
       
         case "not" :     
           if (selected) {
@@ -235,12 +288,16 @@ class circuitGrid {
           switch(Type) {
           
             case "and" :
-              if (gates.get(Inputs.get(prevGate)).Type == "and" || gates.get(Inputs.get(prevGate)).Type == "or") {
+              if (gates.get(Inputs.get(prevGate)).Type == "and" || gates.get(Inputs.get(prevGate)).Type == "or" || gates.get(Inputs.get(prevGate)).Type == "xor") {
                 line(gates.get(Inputs.get(prevGate)).posX + 5 * Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 10 * Scale, posY);
               }
               
               if (gates.get(Inputs.get(prevGate)).Type == "not") {
                 line(gates.get(Inputs.get(prevGate)).posX + Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 10 * Scale, posY);
+              }
+              
+              if (gates.get(Inputs.get(prevGate)).Type == "out") {
+                line(gates.get(Inputs.get(prevGate)).posX + 6 * Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 10 * Scale, posY);
               }
               
               break;
@@ -250,19 +307,42 @@ class circuitGrid {
                 line(gates.get(Inputs.get(prevGate)).posX + Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 10 * Scale, posY);
               }
               
-              if (gates.get(Inputs.get(prevGate)).Type == "and" || gates.get(Inputs.get(prevGate)).Type == "or") {
+              if (gates.get(Inputs.get(prevGate)).Type == "and" || gates.get(Inputs.get(prevGate)).Type == "or" || gates.get(Inputs.get(prevGate)).Type == "xor") {
                 line(gates.get(Inputs.get(prevGate)).posX + 5 * Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 10 * Scale, posY);
+              }
+              
+              if (gates.get(Inputs.get(prevGate)).Type == "out") {
+                line(gates.get(Inputs.get(prevGate)).posX + 6 * Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 10 * Scale, posY);
               }
               
               break;
             
             case "or" :
-              if (gates.get(Inputs.get(prevGate)).Type == "or" || gates.get(Inputs.get(prevGate)).Type == "and") {
+              if (gates.get(Inputs.get(prevGate)).Type == "or" || gates.get(Inputs.get(prevGate)).Type == "and" || gates.get(Inputs.get(prevGate)).Type == "xor") {
                 line(gates.get(Inputs.get(prevGate)).posX + 5 * Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 5.5 * Scale, posY + 0.5 * Scale);
               }
               
               if (gates.get(Inputs.get(prevGate)).Type == "not") {
                 line(gates.get(Inputs.get(prevGate)).posX + Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 5.5 * Scale, posY + 0.5 * Scale);
+              }
+              
+              if (gates.get(Inputs.get(prevGate)).Type == "out") {
+                line(gates.get(Inputs.get(prevGate)).posX + 6 * Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 5.5 * Scale, posY + 0.5 * Scale);
+              }
+              
+              break;
+              
+            case "xor" :
+              if (gates.get(Inputs.get(prevGate)).Type == "or" || gates.get(Inputs.get(prevGate)).Type == "and" || gates.get(Inputs.get(prevGate)).Type == "xor") {
+                line(gates.get(Inputs.get(prevGate)).posX + 5 * Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 7.5 * Scale, posY + 0.5 * Scale);
+              }
+              
+              if (gates.get(Inputs.get(prevGate)).Type == "not") {
+                line(gates.get(Inputs.get(prevGate)).posX + Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 7.5 * Scale, posY + 0.5 * Scale);
+              }
+              
+              if (gates.get(Inputs.get(prevGate)).Type == "out") {
+                line(gates.get(Inputs.get(prevGate)).posX + 6 * Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 7.5 * Scale, posY + 0.5 * Scale);
               }
               
               break;
@@ -272,8 +352,12 @@ class circuitGrid {
                 line(gates.get(Inputs.get(prevGate)).posX + Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 10 * Scale, posY);
               }
               
-              if (gates.get(Inputs.get(prevGate)).Type == "and" || gates.get(Inputs.get(prevGate)).Type == "or") {
+              if (gates.get(Inputs.get(prevGate)).Type == "and" || gates.get(Inputs.get(prevGate)).Type == "or" || gates.get(Inputs.get(prevGate)).Type == "xor") {
                 line(gates.get(Inputs.get(prevGate)).posX + 5 * Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 6 * Scale, posY);
+              }
+              
+              if (gates.get(Inputs.get(prevGate)).Type == "out") {
+                line(gates.get(Inputs.get(prevGate)).posX + 6 * Scale, gates.get(Inputs.get(prevGate)).posY + 0.7 * Scale, posX - 6 * Scale, posY);
               }
           }
         }
@@ -308,8 +392,8 @@ class circuitGrid {
     void checkClick() {
       int prevMillis = 0;
       
-      if (currentTool == 0 && mouseY > -5 * Scale + posY && mouseY < 10 * Scale + posY - Scale*Scale) {
-        if (mouseX > -10 * Scale + posX && mouseX <= Scale * 15 + posX - Scale*Scale*2) {
+      if (currentTool == 0 && mouseY > -5 * Scale + posY && mouseY < 10 * Scale + posY - Scale) {
+        if (mouseX > -10 * Scale + posX && mouseX <= Scale * 15 + posX - Scale*5) {
           
           if (selected == false && millis() - prevMillis > 100) {
             selected = true; 
@@ -343,6 +427,12 @@ class circuitGrid {
       
       if (Type == "or" && Inputs.size() > 1) {
         if (gates.get(Inputs.get(0)).Output || gates.get(Inputs.get(1)).Output && Inputs.get(0) != 228 && Inputs.get(1) != 228) {
+          return true;
+        }  else {return false;}
+      }
+      
+      if (Type == "xor" && Inputs.size() > 1) {
+        if (gates.get(Inputs.get(0)).Output && !gates.get(Inputs.get(1)).Output || !gates.get(Inputs.get(0)).Output && gates.get(Inputs.get(1)).Output) {
           return true;
         }  else {return false;}
       }

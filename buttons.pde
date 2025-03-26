@@ -1,5 +1,6 @@
 boolean CtrlPressed = false;
 boolean ShiftPressed = false;
+boolean middleMousePressed = false;
 
 char[] lettersListRU = {'й','ц','у','к','е','н','г','ш','щ','з','х','ъ','ф','ы','в','а','п','р','о','л','д','ж','э','я','ч','с','м','и','т','ь','б','ю'};
 char[] lettersListEN = {'q','w','e','r','t','y','u','i','o','p','[',']','a','s','d','f','g','h','j','k','l',';','\'','z','x','c','v','b','n','m',',','.'};
@@ -30,19 +31,22 @@ void keyPressed() {
   if (pressedKey == '4' && !CtrlPressed) {
     currentTool = 4;
   }
+  if (pressedKey == '5' && !CtrlPressed) {
+    currentTool = 5;
+  }
   
   if (pressedKey(key) == 'i' && !CtrlPressed) {
     if (selectedID.size() == 2 && grid.gates.get(selectedID.get(1)).Inputs.size() < 2 && grid.gates.get(selectedID.get(1)).Type == "and") {
       grid.gates.get(selectedID.get(1)).Inputs.add(selectedID.get(0));
     }
     
-    if (selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "and" || selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "or") {
+    if (selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "and" || selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "or" || selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "xor") {
       grid.gates.get(selectedID.get(2)).Inputs.add(selectedID.get(0));
       grid.gates.get(selectedID.get(2)).Inputs.add(selectedID.get(1));
       println("CONNECTED");
     }
     
-    else if (selectedID.size() > 1 && grid.gates.get(selectedID.get(1)).Type == "not" || selectedID.size() > 1 && grid.gates.get(selectedID.get(1)).Type == "out") {
+    if (selectedID.size() == 2 && grid.gates.get(selectedID.get(1)).Type == "not" || selectedID.size() == 2 && grid.gates.get(selectedID.get(1)).Type == "out") {
       grid.gates.get(selectedID.get(1)).Inputs.add(selectedID.get(0));
       println("CONNECTED");
     }
@@ -149,11 +153,14 @@ void keyPressed() {
   if (key == '4' && CtrlPressed == true) { //Create OUT gate
     grid.createGate(3);
   }
+  if (key == '5' && CtrlPressed == true) { //Create OUT gate
+    grid.createGate(4);
+  }
 }
 
 
 void mouseClicked() {
-  if (grid.gates.size() > 0 && currentTool == 0) {  //Select gate
+  if (grid.gates.size() > 0 && currentTool == 0 && mouseButton == LEFT) {  //Select gate
     if (!CtrlPressed) {
       for (int gate = 0; gate < grid.gates.size(); gate++) {
         if (grid.gates.get(gate).selected) {grid.gates.get(gate).selected = false;}
@@ -166,22 +173,37 @@ void mouseClicked() {
     }
   }
   
-  if (currentTool == 1) {  //Create AND gate
+  if (currentTool == 1  && mouseButton == LEFT && mouseY > 65) {  //Create AND gate
     grid.createGate(0);
   }
   
-  if (currentTool == 2) {  //Create OR gate
+  if (currentTool == 2  && mouseButton == LEFT && mouseY > 65) {  //Create OR gate
     grid.createGate(1); 
   }
   
-  if (currentTool == 3) {  //Create NOT gate
+  if (currentTool == 5  && mouseButton == LEFT && mouseY > 65) {  //Create XOR gate
+    grid.createGate(4); 
+  }
+  
+  if (currentTool == 3  && mouseButton == LEFT && mouseY > 65) {  //Create NOT gate
     grid.createGate(2);
   }
   
-  if (currentTool == 4) {  //Create OUT gate
+  if (currentTool == 4  && mouseButton == LEFT && mouseY > 65) {  //Create OUT gate
     grid.createGate(3);
   }
+  
+  if (mouseButton == CENTER) {
+    middleMousePressed = !middleMousePressed;
+  }
 }
+
+/*void mouseReleased() {
+  if (mouseButton == CENTER) {
+    println("middle unclick");
+    middleMousePressed = false;
+  }
+}*/
 
 void keyReleased() {
   if (key == CODED && keyCode == CONTROL) {CtrlPressed = false;}
@@ -204,4 +226,23 @@ char pressedKey(char keey) {
   }
   
   return out;
+}
+
+public void Select() {
+  currentTool = 0;
+}
+public void AND() {
+  currentTool = 1;
+}
+public void OR() {
+  currentTool = 2;
+}
+public void NOT() {
+  currentTool = 3;
+}
+public void XOR() {
+  currentTool = 5;
+}
+public void OUT(){
+  currentTool = 4;
 }
