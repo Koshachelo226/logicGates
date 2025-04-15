@@ -1,0 +1,4 @@
+id,type,inputs,output,posX,posY,toggled
+0,and,empty,false,234.0,127.0,false
+1,and,0:2,false,358.0,180.0,false
+2,and,empty,false,199.0,304.0,false

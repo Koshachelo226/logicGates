@@ -13,7 +13,13 @@ float prevMouseY;
 int prevXmouse;
 int prevYmouse;
 
+circuitGrid tempGrid = new circuitGrid();
+ArrayList<Integer> copiedNewIDs = new ArrayList<Integer>();
+ArrayList<Integer> copiedOldIDs = new ArrayList<Integer>();
+
 String[] toolsEN = {"Selection", "AND", "OR", "NOT", "OUT", "XOR"};
+String[] tipsGates = {"0 - Selection tool", "1 - AND gate", "2 - OR gate", "3 - NOT gate", "4 - OUT gate", "5 - XOR gate"};
+String[] tipsKeys = {"MMB/Ctrl+D - Move grid", "S/L - Save/load grid", "+/- - Change scale", "Ctrl+I - clear inputs", "Delete - Remove gates", "M - Move gates", "D - Deselect gates", "T - Toggle gate", "I - Connect gates"};
 
 boolean drawGrid = true;
 
@@ -27,6 +33,27 @@ void setup() {
   mainFont = loadFont("Arial-Black-36.vlw");
   frameRate(3000);
   
+  cp5.addTextfield("SaveName")
+     .setPosition((width/2)-100,height/2)
+     .setSize(200,40)
+     .setFont(mainFont)
+     .setFocus(true)
+     .setColor(color(255))
+     .setText("Test")
+     .setVisible(false);
+     ;
+  cp5.addButton("Save")
+    .setValue(0)
+    .setPosition((width/2)+110, height/2)
+    .setSize(40, 40)
+    .setVisible(false)
+    ;
+  cp5.addButton("Load")
+    .setValue(0)
+    .setPosition((width/2)+110, height/2)
+    .setSize(40, 40)
+    .setVisible(false)
+    ;
   cp5.addButton("AND")
      .setValue(0)
      .setPosition(65, 5)
@@ -56,7 +83,17 @@ void setup() {
      .setValue(0)
      .setPosition(10, 5)
      .setSize(50,50)
-     ;
+     ; 
+  cp5.addButton("SaveUI")
+    .setLabel("Save")
+    .setValue(0)
+    .setPosition(width-115, 5)
+    .setSize(50, 50);
+  cp5.addButton("LoadUI")
+    .setLabel("Load")
+    .setValue(0)
+    .setPosition(width-60, 5)
+    .setSize(50, 50);
 }
 
 void draw() {
@@ -72,13 +109,7 @@ void draw() {
     }
   }
   
-  /*for (int lineX = width; lineX >= 0; lineX -= 30) {
-    line (lineX, 0, lineX, height);
-  }*/
-  
-  /*for (int lineY = 30; lineY <= height; lineY += 30) {
-    line (0, lineY, width, lineY);
-  }*/
+  cp5.draw();
   
   for (int gate = 0; gate < grid.gates.size(); gate++) {
     
@@ -93,15 +124,8 @@ void draw() {
     grid.gates.get(gate).calcGate();
   }
   
-  if (grid.gates.size() > 0) {
-    //print("Selected: " + selectedID + " ");
-    //println(selectedID.size());
-    //println("Existing: " + grid.gates.size());
-    //println("Next ID: " + grid.lastID);
-    
-    for (int gate = 0; gate < grid.gates.size(); gate++) {
-      //println(grid.gates.get(gate).ID + ": " + grid.gates.get(gate).Inputs);
-    }
+  for (int gate = 0; gate < tempGrid.gates.size(); gate++) {
+    //println(tempGrid.gates.get(gate).ID);
   }
   
   if (!mousePressed) {
@@ -140,24 +164,18 @@ void draw() {
   fill(255);
   textFont(mainFont, 24);
   text(toolsEN[currentTool], (width/2)-30, height - 20);
-  textFont(mainFont, 12);
-  text("5 - XOR gate", width - 120, height - 5);
-  text("4 - OUT gate", width - 120, height - 15);
-  text("3 - NOT gate", width - 120, height - 25);
-  text("2 - OR gate", width - 120, height - 35);
-  text("1 - AND gate", width - 120, height - 45);
-  text("0 - Selection tool", width - 120, height - 55);
-  
-  text("MMB - Move grid", 5, height - 5);
-  text("S/L - Save/load grid", 5, height - 15);
-  text("+/- - Change scale", 5, height - 25);
-  text("Delete - Remove gates", 5, height - 35);
-  text("M - Move gates", 5, height - 45);
-  text("D - Deselect gates", 5, height - 55);
-  text("T - Toggle gate", 5, height - 65);
-  text("I - Connect gates", 5, height - 75);
+  drawTips();
+}
 
-  //println(frameRate);
+boolean isIntArray(ArrayList<Integer> array, int number) {
+  boolean output = false;
+  if (array.size() > 0) {
+    for (int i = 0; i < array.size(); i++) {
+      output = (number == array.get(i));
+      if (output) {break;}
+    }
+  }
+  return output;
 }
 
 void box(float x1, float y1, float x2, float y2) {
@@ -212,13 +230,13 @@ void loadGrid(String path) {
   Table loadSave = loadTable(path);
   
   grid.gates.clear();
+  selectedID.clear();
   for (int rowNumb = 1; rowNumb < loadSave.getRowCount(); rowNumb++) {
     int newID = loadSave.getRow(rowNumb).getInt(0);
     String newType = loadSave.getRow(rowNumb).getString(1);
     
     ArrayList<Integer> newInputs = new ArrayList<Integer>();
     if (!loadSave.getRow(rowNumb).getString(2).equals("empty")) {
-      println(loadSave.getRow(rowNumb).getString(2));
       String[] newRawInputs = split(loadSave.getRow(rowNumb).getString(2), ':');
       for (int i = 0; i < newRawInputs.length; i++) {
         newInputs.add(int(newRawInputs[i]));
@@ -236,5 +254,102 @@ void loadGrid(String path) {
     
     grid.createNewGate(newID, newType, newInputs, newOutput, newPosX, newPosY, newToggled);
     
+  }
+}
+
+void drawTips() {
+  textFont(mainFont, 12);
+  for (int y = 0; y < tipsGates.length; y++) {
+    text(tipsGates[y], width-120, height - (5 + 10*y));
+  }
+  
+  for (int y = 0; y < tipsKeys.length; y++) {
+    text(tipsKeys[y], 5, height - (5 + 10*y));
+  }
+}
+
+void copyGates() {
+  //ArrayList<circuitGrid.gate> copyGates = new ArrayList<circuitGrid.gate>();
+  tempGrid.gates.clear();
+  
+  if (selectedID.size() > 0) {
+    
+    for (int ID = 0; ID < selectedID.size(); ID++) {
+      copiedOldIDs.add(selectedID.get(ID));
+      copiedNewIDs.add(grid.lastID);
+      grid.lastID++;
+    } 
+    
+    
+    
+    for (int ID = 0; ID < selectedID.size(); ID++) {
+      //copyGates.add(grid.gates.get(selectedID.get(ID)));
+      //circuitGrid.gate newGate = tempGrid.new gate();
+      int newID = selectedID.get(ID);
+      String newType = grid.gates.get(selectedID.get(ID)).Type;
+      ArrayList<Integer> newInputs = grid.gates.get(selectedID.get(ID)).Inputs;
+      String newOutput = str(grid.gates.get(selectedID.get(ID)).Output);
+      float newPosX = grid.gates.get(selectedID.get(ID)).posX;
+      float newPosY = grid.gates.get(selectedID.get(ID)).posY;
+      String newToggled = str(grid.gates.get(selectedID.get(ID)).toggled);
+      tempGrid.createNewGate(newID, newType, newInputs, newOutput, newPosX, newPosY, newToggled);
+    }
+  }
+}
+
+void pasteGates() {
+  ArrayList<circuitGrid.gate> newGates = new ArrayList<circuitGrid.gate>();
+  for (int gate = 0; gate < tempGrid.gates.size(); gate++) {
+    circuitGrid newGrid = new circuitGrid();
+    circuitGrid.gate newGate = newGrid.new gate();
+    
+    newGate.ID = tempGrid.gates.get(gate).ID;
+    newGate.Type = tempGrid.gates.get(gate).Type;
+    newGate.Inputs = tempGrid.gates.get(gate).Inputs;
+    newGate.Output = tempGrid.gates.get(gate).Output;
+    newGate.posX = tempGrid.gates.get(gate).posX;
+    newGate.posY = tempGrid.gates.get(gate).posY;
+    newGate.toggled = tempGrid.gates.get(gate).toggled;
+    
+    newGates.add(tempGrid.gates.get(gate) /*newGate*/);
+  }
+  
+  for (int gate = 0; gate < newGates.size(); gate++) {
+    for (int input = 0; input < newGates.get(gate).Inputs.size(); input++) {
+      //copyGates.get(gate).ID = newIDs.get(gate);
+    
+      if (isIntArray(selectedID, input)) {
+        println("Changed");
+        for (int oldID = 0; oldID < newGates.size(); oldID++) {
+          if (newGates.get(gate).Inputs.get(input) == copiedOldIDs.get(gate)) {
+            newGates.get(gate).Inputs.set(input, copiedNewIDs.get(gate));
+          }
+        }
+      }
+    }
+      
+    newGates.get(gate).ID = copiedNewIDs.get(gate);
+      
+    //newGates.get(gate).posX += mouseX/4;
+    //newGates.get(gate).posY += mouseY/4;
+  }
+   for (int id = selectedID.size()-1; id >= 0; id--) {
+    grid.gates.get(selectedID.get(id)).selected = false;
+    selectedID.remove(id);
+   } 
+  for (int gate = 0; gate < newGates.size(); gate++) {
+    newGates.get(gate).selected = true;
+    selectedID.add(newGates.get(gate).ID);
+    
+    int newID = newGates.get(gate).ID;
+    String newType = newGates.get(gate).Type; println(newGates.get(gate).Inputs);
+    ArrayList<Integer> newInputs = newGates.get(gate).Inputs; println(newInputs);
+    String newOutput = str(newGates.get(gate).Output);
+    float newPosX = newGates.get(gate).posX;
+    float newPosY = newGates.get(gate).posY;
+    String newToggled = str(newGates.get(gate).toggled);
+    //grid.createNewGate(newID, newType, newInputs, newOutput, newPosX, newPosY, newToggled);
+    //grid.gates.get(grid.gates.size()-1).selected = true;
+    grid.gates.add(newGates.get(gate));
   }
 }

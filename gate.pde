@@ -39,7 +39,6 @@ class circuitGrid {
     gate newGate = new gate();
     lastID = gates.size() + 1;
     newGate.ID = id;
-    //newGate.Type = type;
     
     switch(type) {
       case "and" :

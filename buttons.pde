@@ -16,22 +16,22 @@ void keyPressed() {
     currentTool = 0; //Selection tool (click)
   }
   
-  if (pressedKey == '1' && !CtrlPressed) {
+  if (pressedKey == '1' && !CtrlPressed && !cp5.get(Textfield.class, "SaveName").isVisible()) {
     currentTool = 1;
   }
   
-  if (pressedKey == '2' && !CtrlPressed) {
+  if (pressedKey == '2' && !CtrlPressed && !cp5.get(Textfield.class, "SaveName").isVisible()) {
     currentTool = 2;
   }
   
-  if (pressedKey == '3' && !CtrlPressed) {
+  if (pressedKey == '3' && !CtrlPressed && !cp5.get(Textfield.class, "SaveName").isVisible()) {
     currentTool = 3;
   }
   
-  if (pressedKey == '4' && !CtrlPressed) {
+  if (pressedKey == '4' && !CtrlPressed && !cp5.get(Textfield.class, "SaveName").isVisible()) {
     currentTool = 4;
   }
-  if (pressedKey == '5' && !CtrlPressed) {
+  if (pressedKey == '5' && !CtrlPressed && !cp5.get(Textfield.class, "SaveName").isVisible()) {
     currentTool = 5;
   }
   
@@ -43,20 +43,29 @@ void keyPressed() {
     if (selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "and" || selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "or" || selectedID.size() > 2 && grid.gates.get(selectedID.get(2)).Type == "xor") {
       grid.gates.get(selectedID.get(2)).Inputs.add(selectedID.get(0));
       grid.gates.get(selectedID.get(2)).Inputs.add(selectedID.get(1));
-      println("CONNECTED");
     }
     
     if (selectedID.size() == 2 && grid.gates.get(selectedID.get(1)).Type == "not" || selectedID.size() == 2 && grid.gates.get(selectedID.get(1)).Type == "out") {
       grid.gates.get(selectedID.get(1)).Inputs.add(selectedID.get(0));
-      println("CONNECTED");
     }
   }
   
   if (key == 9 && selectedID.size() > 0) {  //Ctrl+I = 9... Stupid Ctrl keys and ASCII...
-    println("Cleared");
     for (int gate = 0; gate < selectedID.size(); gate++) {
       grid.gates.get(selectedID.get(gate)).Inputs.clear();
     }
+  }
+  
+  if (key == 3 && selectedID.size() > 0) {  //Ctrl+C
+    copyGates();
+  }
+  
+  if (key == 22/* && selectedID.size() > 0*/) {  //Ctrl+V
+    pasteGates();
+  }
+  
+  if (key == 4) {  //Ctrl+D
+    middleMousePressed = !middleMousePressed;
   }
   
   if (pressedKey(key) == 't' && grid.gates.size() > 0) {
@@ -130,37 +139,37 @@ void keyPressed() {
     Scale++;
   }
   
-  if (pressedKey(key) == 's' && grid.gates.size() > 0) {
-    saveGrid("save/grid.csv");
+  if (pressedKey(key) == 's' && grid.gates.size() > 0 && !cp5.get(Textfield.class, "SaveName").isActive() && !cp5.get(Button.class, "Load").isVisible()) {
+    cp5.get(Textfield.class, "SaveName").setVisible(!cp5.get(Textfield.class, "SaveName").isVisible());
+    cp5.get(Button.class, "Save").setVisible(!cp5.get(Button.class, "Save").isVisible());
   }
   
-  if (pressedKey(key) == 'l') {
-    grid.gates.clear();
-    selectedID.clear();
-    loadGrid("save/grid.csv");
+  if (pressedKey(key) == 'l' && !cp5.get(Textfield.class, "SaveName").isActive() && !cp5.get(Button.class, "Save").isVisible()) {
+    cp5.get(Button.class, "Load").setVisible(!cp5.get(Button.class, "Load").isVisible());
+    cp5.get(Textfield.class, "SaveName").setVisible(!cp5.get(Textfield.class, "SaveName").isVisible());
   }
   
   
-  if (key == '1' && CtrlPressed == true) { //Create AND gate
+  if (key == '1' && CtrlPressed == true && !cp5.get(Textfield.class, "SaveName").isVisible()) { //Create AND gate
     grid.createGate(0);
   }
-  if (key == '2' && CtrlPressed == true) { //Create OR gate
+  if (key == '2' && CtrlPressed == true && !cp5.get(Textfield.class, "SaveName").isVisible()) { //Create OR gate
     grid.createGate(1);
   }
-  if (key == '3' && CtrlPressed == true) { //Create NOT gate
+  if (key == '3' && CtrlPressed == true && !cp5.get(Textfield.class, "SaveName").isVisible()) { //Create NOT gate
     grid.createGate(2);
   }
-  if (key == '4' && CtrlPressed == true) { //Create OUT gate
+  if (key == '4' && CtrlPressed == true && !cp5.get(Textfield.class, "SaveName").isVisible()) { //Create OUT gate
     grid.createGate(3);
   }
-  if (key == '5' && CtrlPressed == true) { //Create OUT gate
+  if (key == '5' && CtrlPressed == true && !cp5.get(Textfield.class, "SaveName").isVisible()) { //Create OUT gate
     grid.createGate(4);
   }
 }
 
 
 void mouseClicked() {
-  if (grid.gates.size() > 0 && currentTool == 0 && mouseButton == LEFT) {  //Select gate
+  if (grid.gates.size() > 0 && currentTool == 0 && mouseButton == LEFT && !cp5.get(Textfield.class, "SaveName").isVisible()) {  //Select gate
     if (!CtrlPressed) {
       for (int gate = 0; gate < grid.gates.size(); gate++) {
         if (grid.gates.get(gate).selected) {grid.gates.get(gate).selected = false;}
@@ -173,23 +182,23 @@ void mouseClicked() {
     }
   }
   
-  if (currentTool == 1  && mouseButton == LEFT && mouseY > 65) {  //Create AND gate
+  if (currentTool == 1  && mouseButton == LEFT && mouseY > 65 && !cp5.get(Textfield.class, "SaveName").isVisible()) {  //Create AND gate
     grid.createGate(0);
   }
   
-  if (currentTool == 2  && mouseButton == LEFT && mouseY > 65) {  //Create OR gate
+  if (currentTool == 2  && mouseButton == LEFT && mouseY > 65 && !cp5.get(Textfield.class, "SaveName").isVisible()) {  //Create OR gate
     grid.createGate(1); 
   }
   
-  if (currentTool == 5  && mouseButton == LEFT && mouseY > 65) {  //Create XOR gate
+  if (currentTool == 5  && mouseButton == LEFT && mouseY > 65 && !cp5.get(Textfield.class, "SaveName").isVisible()) {  //Create XOR gate
     grid.createGate(4); 
   }
   
-  if (currentTool == 3  && mouseButton == LEFT && mouseY > 65) {  //Create NOT gate
+  if (currentTool == 3  && mouseButton == LEFT && mouseY > 65 && !cp5.get(Textfield.class, "SaveName").isVisible()) {  //Create NOT gate
     grid.createGate(2);
   }
   
-  if (currentTool == 4  && mouseButton == LEFT && mouseY > 65) {  //Create OUT gate
+  if (currentTool == 4  && mouseButton == LEFT && mouseY > 65 && !cp5.get(Textfield.class, "SaveName").isVisible()) {  //Create OUT gate
     grid.createGate(3);
   }
   
@@ -197,13 +206,6 @@ void mouseClicked() {
     middleMousePressed = !middleMousePressed;
   }
 }
-
-/*void mouseReleased() {
-  if (mouseButton == CENTER) {
-    println("middle unclick");
-    middleMousePressed = false;
-  }
-}*/
 
 void keyReleased() {
   if (key == CODED && keyCode == CONTROL) {CtrlPressed = false;}
@@ -243,6 +245,30 @@ public void NOT() {
 public void XOR() {
   currentTool = 5;
 }
-public void OUT(){
+public void OUT(){ 
   currentTool = 4;
+}
+
+public void SaveUI() {
+  if (grid.gates.size() > 0 && !cp5.get(Textfield.class, "SaveName").isActive() && !cp5.get(Button.class, "Load").isVisible()) {
+    cp5.get(Textfield.class, "SaveName").setVisible(!cp5.get(Textfield.class, "SaveName").isVisible());
+    cp5.get(Button.class, "Save").setVisible(!cp5.get(Button.class, "Save").isVisible());
+  }
+}
+
+public void LoadUI() {
+  if (millis() > 5000 && !cp5.get(Textfield.class, "SaveName").isActive() && !cp5.get(Button.class, "Save").isVisible()) {
+    cp5.get(Button.class, "Load").setVisible(!cp5.get(Button.class, "Load").isVisible());
+    cp5.get(Textfield.class, "SaveName").setVisible(!cp5.get(Textfield.class, "SaveName").isVisible());
+  }
+}
+public void Save() {
+  if (millis() > 5000 && cp5.get(Textfield.class, "SaveName").isVisible()) {
+    saveGrid("save/" + cp5.get(Textfield.class, "SaveName").getText() + ".csv");
+  }
+}
+public void Load() {
+  if (millis() > 5000 && cp5.get(Textfield.class, "SaveName").isVisible()) {
+    loadGrid("save/" + cp5.get(Textfield.class, "SaveName").getText() + ".csv");
+  }
 }
